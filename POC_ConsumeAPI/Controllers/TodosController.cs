@@ -11,7 +11,7 @@ namespace POC_ConsumeAPI.Controllers
 {
     [Consumes("application/json")]
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/Todo")]
     [ApiController]
 
     public class TodosController : ControllerBase
@@ -29,8 +29,8 @@ namespace POC_ConsumeAPI.Controllers
 
         #region HTTP Verbs
 
-        [Route("/Todolist/Get")]
-        [HttpGet()]
+        [Route("~/api/GetAllTodos")]
+        [HttpGet]
         public async Task<IActionResult> GetData()
         {
             List<TodoList> result = await _helperService.GetToDoList();
@@ -45,25 +45,25 @@ namespace POC_ConsumeAPI.Controllers
            
         }
 
-        [Route("Todolist/GetById")]
-        [HttpGet("{paramOne}")]
-        public async Task<IActionResult> GetDataById(int paramOne)
+        [Route("~/api/GetAllTodos/{id}")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDataById(int id)
         {
-            TodoList result = await _helperService.GetToDoListbyID(paramOne);
+            TodoList result = await _helperService.GetToDoListbyID(id);
             if (result == null)
             {
-                _logger.LogWarning("Get({Id}) NOT FOUND", paramOne);
+                _logger.LogWarning("Get({Id}) NOT FOUND", id);
                 throw new NotFoundException("Requested Item Not Found");
             }
-            _logger.LogInformation("Getting item {paramOne}", paramOne);
+            _logger.LogInformation("Getting item {paramOne}", id);
             ResponseMessageObject = ApiResponse.Success(200, result);
-            ResponseMessageObject.Message = "Getting item of {Id}" + paramOne.ToString();
+            ResponseMessageObject.Message = "Getting item of {Id}" + id.ToString();
             return Ok(ResponseMessageObject);
 
         }
 
-        [Route("/Todolist/Create")]
-        [HttpPost()]
+        [Route("~/api/AddTodo")]
+        [HttpPost]
         public async Task<IActionResult> CreateData(TodoList model)
         {
 
@@ -89,9 +89,8 @@ namespace POC_ConsumeAPI.Controllers
                ResponseMessageObject);
         }
 
-
-        [Route("/Todolist/Update")]
-        [HttpPut("{id:int}")]
+        [Route("~/api/UpdateTodo")]
+        [HttpPut]
         public async Task<IActionResult> UpdateData(TodoList model, int id)
         {
 
@@ -117,9 +116,8 @@ namespace POC_ConsumeAPI.Controllers
 
         }
 
-
-        [Route("/Todolist/Delete")]
-        [HttpDelete("{id}")]
+        [Route("~/api/DeleteTodo/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteDataByID(int id)
         {
 
