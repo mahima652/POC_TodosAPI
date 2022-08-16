@@ -34,30 +34,33 @@ namespace POC_ConsumeAPI.Controllers
         public async Task<IActionResult> GetData()
         {
             List<TodoList> result = await _helperService.GetToDoList();
-            if (result != null)
+            if (result == null)
             {
-                _logger.LogInformation("Todos list get Executed");
-                ResponseMessageObject = ApiResponse.Success(200, result);
-                ResponseMessageObject.Message = "Todos List get Exceuted";
-                return Ok(ResponseMessageObject);
+                _logger.LogWarning("List is empty");
+                return NotFound($"Item not found Successfully ");
             }
-            throw new Exception("Error feteching data : Server Error");
-           
+            ResponseMessageObject = ApiResponse.Success(200, result);
+            ResponseMessageObject.Message = "Todos List get Exceuted";
+
+            _logger.LogInformation("Todos list get Executed");
+            return Ok(ResponseMessageObject);
+
         }
 
-        [Route("~/api/GetAllTodos/{id}")]
+        [Route("~/api/GetTodo/{id}")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDataById(int id)
         {
             TodoList result = await _helperService.GetToDoListbyID(id);
             if (result == null)
             {
-                _logger.LogWarning("Get({Id}) NOT FOUND", id);
-                throw new NotFoundException("Requested Item Not Found");
+                _logger.LogWarning("Get NOTFOUND of ", id);
+                return NotFound($"Item not found Successfully with id = {id} ");
             }
-            _logger.LogInformation("Getting item {paramOne}", id);
             ResponseMessageObject = ApiResponse.Success(200, result);
-            ResponseMessageObject.Message = "Getting item of {Id}" + id.ToString();
+            ResponseMessageObject.Message = "Getting item of id:- " + id.ToString();
+
+            _logger.LogInformation("Getting item  of", id);
             return Ok(ResponseMessageObject);
 
         }
@@ -66,24 +69,21 @@ namespace POC_ConsumeAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateData(TodoList model)
         {
-
             if (model == null)
             {
                 _logger.LogWarning("Input not valid ");
                 return BadRequest("Input not valid ");
             }
-
-            var expected = await _helperService.GetToDoListbyID(model.id);
-            if (expected != null)
-            {
-                Console.WriteLine("Model is already in use");
-                _logger.LogWarning("Requested input is already present");
-                return BadRequest("Requested input is already present");
-            }
-
             var createdModel = await _helperService.AddTodos(model);
+            if (createdModel == null)
+            {
+                _logger.LogWarning("Item not added Successfully with id :-", model.id);
+                Console.WriteLine($"Item not added Successfully with id = {model.id} ");
+                return NotFound($"Item not added Successfully with id = {model.id} ");
+            }
             ResponseMessageObject = ApiResponse.Success(201, createdModel);
-            ResponseMessageObject.Message = "Successfully Requted item Cretaed ";
+            ResponseMessageObject.Message = " Requted item is created Successfully";
+
             _logger.LogInformation("New item created");
             return CreatedAtAction(nameof(GetData), new { id = createdModel.id },
                ResponseMessageObject);
@@ -93,24 +93,30 @@ namespace POC_ConsumeAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateData(TodoList model, int id)
         {
-
             if (id != model.id)
             {
                 _logger.LogWarning("Input not valid ");
-                return BadRequest();
+                return BadRequest("Input id is not valid ");
             }
             var modelToupdate = await _helperService.GetToDoListbyID(model.id);
             if (modelToupdate == null)
             {
                 _logger.LogWarning("Get({Id}) NOT FOUND", id);
-                Console.WriteLine("Model with Id = {id} not found");
+                Console.WriteLine($"Model with Id = {id} not found");
                 return NotFound($"Model with Id = {id} not found");
             }
-
             var updatedModel = await _helperService.UpdateTodos(model, id);
+            if (updatedModel == null)
+            {
+
+                _logger.LogWarning("Item not updated Successfully with id :-", model.id);
+                Console.WriteLine($"Item not updated Successfully with id = {model.id} ");
+                return NotFound($"Item not updated Successfully with id = {model.id} ");
+            }
+            ResponseMessageObject = ApiResponse.Success(201, updatedModel);
+            ResponseMessageObject.Message = "Requted item is Updated Successfully";
+
             _logger.LogInformation(" Requested item Updated");
-            ResponseMessageObject = ApiResponse.Success(200, updatedModel);
-            ResponseMessageObject.Message = "Successfully Requted item Updated ";
             return CreatedAtAction(nameof(GetData), new { id = updatedModel.id },
                   ResponseMessageObject);
 
@@ -120,16 +126,16 @@ namespace POC_ConsumeAPI.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteDataByID(int id)
         {
-
             bool result = await _helperService.DeleteByID(id);
             if (!result)
             {
-                _logger.LogWarning("Get({Id}) NOT FOUND", id);
-                throw new NotFoundException("Requested Item Not Found");
+                _logger.LogWarning("Get NOT FOUND", id);
+                return NotFound($"Item not deleted Successfully with id = {id} ");
             }
-            _logger.LogInformation(" Requested item is Deleted");
             ResponseMessageObject = ApiResponse.Success(200, null);
-            ResponseMessageObject.Message = "Successfully Requted item Deleted ";
+            ResponseMessageObject.Message = "Requted item is Deleted Successfully";
+            
+            _logger.LogInformation(" Requested item is Deleted Successfully");
             return Ok(ResponseMessageObject);
         }
     }

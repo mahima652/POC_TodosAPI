@@ -30,9 +30,9 @@ namespace POC_ConsumeAPI.Helper
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = response.Content.ReadAsStringAsync().Result;
-                Data.Data.dataCxt = JsonConvert.DeserializeObject<List<TodoList>>(responseBody);
+                Data.DataContext.dataCxt = JsonConvert.DeserializeObject<List<TodoList>>(responseBody);
                 Console.WriteLine(responseBody);
-                return Data.Data.dataCxt;
+                return Data.DataContext.dataCxt;
             }
             else
             {

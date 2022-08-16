@@ -8,7 +8,9 @@ using POC_ConsumeAPI.Model;
 
 namespace POC_ConsumeAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [Route("api/Todo")]
     [ApiController]
     public class TodosLocalController : ControllerBase
     {
@@ -25,6 +27,7 @@ namespace POC_ConsumeAPI.Controllers
 
         #region HTTP Verbs
 
+        [Route("~/api/GetAllLocalTodos")]
         [HttpGet]
         public async Task<IActionResult> GetTodosList()
         {
@@ -39,8 +42,8 @@ namespace POC_ConsumeAPI.Controllers
             throw new Exception("Error feteching data : Internal Server Error");
         }
 
-
-        [HttpGet("{id}")]
+        [Route("~/api/GetLocalTodo/{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetTodosById(int id)
         {
             TodoList result = await _helperService.GetToDoListbyID(id);
@@ -56,9 +59,9 @@ namespace POC_ConsumeAPI.Controllers
 
         }
 
-
+        [Route("~/api/AddLocalTodo")]
         [HttpPost]
-        public async Task<IActionResult> CreateTodos(TodoList model)
+        public async Task<IActionResult> CreateLocalTodo(TodoList model)
         {
 
             if (model == null)
@@ -84,9 +87,9 @@ namespace POC_ConsumeAPI.Controllers
 
         }
 
-
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateTodos(TodoList model, int id)
+        [Route("~/api/UpdateLocalTodo")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateLocalTodo(TodoList model, int id)
         {
 
             if (id != model.id)
@@ -111,8 +114,9 @@ namespace POC_ConsumeAPI.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodosByID(int id)
+        [Route("~/api/DeleteLocalTodo/{id}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLocalTodoByID(int id)
         {
             bool result = await _helperService.DeleteByID(id);
             if (!result)

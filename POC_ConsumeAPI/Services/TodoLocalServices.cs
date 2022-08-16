@@ -14,7 +14,7 @@ namespace POC_ConsumeAPI.Helper
         private List<TodoList> result;
         public async Task<List<TodoList>> GetToDoList()
         {
-            result = Data.Data.dataCxt;
+            result = Data.DataContext.dataCxt;
             if (result != null)
             {
                 return result;
@@ -41,7 +41,7 @@ namespace POC_ConsumeAPI.Helper
             var updatedModel = result.FirstOrDefault(x => x.id == model.id);
             if (updatedModel == null)
             {
-                Data.Data.dataCxt.Add(model);
+                Data.DataContext.dataCxt.Add(model);
                 return model;
             }
             Console.WriteLine("Requested Item is already present ");
@@ -71,7 +71,7 @@ namespace POC_ConsumeAPI.Helper
             var model = result.FirstOrDefault(x => x.id == id);
             if (model != null)
             {
-                Data.Data.dataCxt.Remove(model);
+                Data.DataContext.dataCxt.Remove(model);
                 return true;
             }
             Console.WriteLine("Requested Id not found ");

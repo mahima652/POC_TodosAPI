@@ -12,7 +12,7 @@ namespace POC_ConsumeAPI.Data
 
     }
 
-    public class Data
+    public class DataContext
     {
         public static  List<TodoList> dataCxt { get; set; }
 

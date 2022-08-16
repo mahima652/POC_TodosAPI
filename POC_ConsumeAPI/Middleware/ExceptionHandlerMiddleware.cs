@@ -32,17 +32,17 @@ namespace POC_ConsumeAPI.Middleware
             switch (ex)
             {
                 case InvalidException:
-                    errorMessageObject.Code = 400;
+                    errorMessageObject.StatusCode = 400;
                     statusCode = (int)HttpStatusCode.BadRequest;
                     break;
 
                 case NotFoundException:
-                    errorMessageObject.Code = 404;
+                    errorMessageObject.StatusCode = 404;
                     statusCode = (int)HttpStatusCode.NotFound;
                     break;
 
                 case UnAuthorizedException:
-                    errorMessageObject.Code = 401;
+                    errorMessageObject.StatusCode = 401;
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     break;
 

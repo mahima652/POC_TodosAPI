@@ -6,7 +6,7 @@ namespace POC_ConsumeAPI.Middleware
     {
 
         private readonly RequestDelegate _next;
-        private const string APIKEYNAME = "ApiKey";
+        private const string APIKEYNAME = "X-APIKey";
 
         public ApiKeyMiddleware(RequestDelegate next )
         {
