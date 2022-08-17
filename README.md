@@ -33,7 +33,7 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:5001/v1/api/AddTodo
+   3. POSTMAN LINK : https://localhost:7098/v1/api/AddTodo
 4. PUT vi/api/UpdateTodo/{id}
    1. Header for X-APIKey should be provided
    2. Request body should have {
@@ -42,20 +42,20 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:5001/v1/api/UpdateTodo/{id}
+   3. POSTMAN LINK : https://localhost:7098/v1/api/UpdateTodo/{id}
    4. Id of parameter and body should be the same
    5. Example for (id-5) : https://localhost:7098/api/UpdateTodo/5
 5. DELETE /v1//api/DeleteTodo/{id}
    1. Header for X-APIKey should be provided
    2. id can not be null and should be provided
-   3. POSTMAN LINK :  https://localhost:5001/v1/api/DeleteTodo/{id}
+   3. POSTMAN LINK :  https://localhost:7098/v1/api/DeleteTodo/{id}
    4. Example for (id-5) : https://localhost:7098/api/DeleteTodo/5
    
 ## TodosLocal Endpoint
   This Controller consume list from Todos(3rd party ) api and perform CRUD operation on it Locally 
 
   1. CRUD operatcanion of this controller not perform untill, Fetch the list from 3rd party given api through Todos Controller- [HttpGet]
-  2. Once the list save locally then start perform CRUD operation for TodosLocal controller , which will going to update , delete , add and read the Todoslist locally 
+  2. Once the list save locally then start perform CRUD operation through TodosLocal controller , which will going to update , delete , add and read the Todoslist          locally 
 
 1. GET /v1/api/GetAllLocalTodos
    1. X-APIKey header should not be the null and  wrong . Key should be {MySecretKey}
@@ -74,7 +74,7 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:5001/v1/api/AddLocalTodo
+   3. POSTMAN LINK : https://localhost:7098/v1/api/AddLocalTodo
 4. PUT vi/api/UpdateLocalTodo/{id}
    1. Header for X-APIKey should be provided
    2. Request body should have {
@@ -83,12 +83,12 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:5001/v1/api/UpdateLocalTodo/{id}
+   3. POSTMAN LINK : https://localhost:7098/v1/api/UpdateLocalTodo/{id}
    4. Id of parameter and body should be the same
    5. Example for (id-5) : https://localhost:7098/api/UpdateLocalTodo/5
 5. DELETE /v1//api/DeleteLocalTodo/{id}
    1. Header for X-APIKey should be provided
    2. id can not be null and should be provided
-   3. POSTMAN LINK :  https://localhost:5001/v1/api/DeleteLocalTodo/{id}
+   3. POSTMAN LINK :  https://localhost:7098/v1/api/DeleteLocalTodo/{id}
    3. Example for (id-5) : https://localhost:7098/api/DeleteLocalTodo/5
    
