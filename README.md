@@ -1,5 +1,5 @@
 # POC_TODOS
- This Project consume 3 Party Given api(https://jsonplaceholder.typicode.com/todos)
+ This Project consume 3rd Party Given api(https://jsonplaceholder.typicode.com/todos)
     and create its own endpoints for accessing on it 
 
 # Access Instructions
@@ -52,9 +52,9 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
    4. Example for (id-5) : https://localhost:7098/api/DeleteTodo/5
    
 ## TodosLocal Endpoint
-  This Controller consume list from Todos(3rd party ) api and perform CRUD operation on it Locally 
+  This Controller get the list from Todos(3rd party ) api and perform CRUD operation on it Locally 
 
-  1. CRUD operatcanion of this controller not perform untill, Fetch the list from 3rd party given api through Todos Controller- [HttpGet]
+  1. CRUD operatcanion of this controller can not perform untill, Fetch the TodoList through TodosController- [HttpGet]
   2. Once the list save locally then start perform CRUD operation through TodosLocal controller , which will going to update , delete , add and read the Todoslist          locally 
 
 1. GET /v1/api/GetAllLocalTodos
