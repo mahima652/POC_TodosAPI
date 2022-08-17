@@ -34,9 +34,9 @@ namespace POC_ConsumeAPI.Controllers
             List<TodoList> result = await _helperService.GetToDoList();
             if (result != null)
             {
-                _logger.LogInformation("Todos list get Executed");
+                _logger.LogInformation("Todos loacl list get Executed");
                 ResponseMessageObject = ApiResponse.Success(200, result);
-                ResponseMessageObject.Message = "Todos List get Exceuted";
+                ResponseMessageObject.Message = "Todos local List get Exceuted";
                 return Ok(ResponseMessageObject);
             }
             throw new Exception("Error feteching data : Internal Server Error");
@@ -49,12 +49,12 @@ namespace POC_ConsumeAPI.Controllers
             TodoList result = await _helperService.GetToDoListbyID(id);
             if (result == null)
             {
-                _logger.LogWarning("Get({Id}) NOT FOUND", id);
+                _logger.LogWarning(" NOT FOUND", id);
                 throw new NotFoundException("Requested Item Not Found");
             }
-            _logger.LogInformation("Getting item {paramOne}", id);
+            _logger.LogInformation("Getting item of id :", id);
             ResponseMessageObject = ApiResponse.Success(200, result);
-            ResponseMessageObject.Message = "Getting item of {Id}" + id.ToString();
+            ResponseMessageObject.Message = "Getting item of id :-" + id.ToString();
             return Ok(ResponseMessageObject);
 
         }
@@ -87,15 +87,15 @@ namespace POC_ConsumeAPI.Controllers
 
         }
 
-        [Route("~/api/UpdateLocalTodo")]
+        [Route("~/api/UpdateLocalTodo/{id}")]
         [HttpPut]
         public async Task<IActionResult> UpdateLocalTodo(TodoList model, int id)
         {
 
             if (id != model.id)
             {
-                _logger.LogWarning("Input not valid ");
-                return BadRequest();
+                _logger.LogWarning("Input not valid :- Requested id is not matched");
+                return BadRequest("Input not valid :- Requested id is not matched");
             }
             var modelToupdate = await _helperService.GetToDoListbyID(model.id);
             if (modelToupdate == null)

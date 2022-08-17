@@ -11,33 +11,29 @@ namespace POC_ConsumeAPI.Helper
 {
     public class TodoLocalServices : ITodoLocalServices
     {
-        private List<TodoList> result;
+        private static List<TodoList> result;
         public async Task<List<TodoList>> GetToDoList()
         {
             result = Data.DataContext.dataCxt;
-            if (result != null)
-            {
-                return result;
-            }
-            Console.WriteLine("List is not present locally");
-            throw new InvalidException("List is not present locally ," +
-                " First need to fetch the list from Todos");
+            CheckList();
+            return result;
         }
 
         public async Task<TodoList> GetToDoListbyID(int id)
         {
-            var model = new TodoList();
-            var resultModel = result.FirstOrDefault(x => x.id == model.id);
+            CheckList();
+            var resultModel = result.FirstOrDefault(x => x.id == id);
             if (resultModel != null)
             {
                 return resultModel;
             }
             Console.WriteLine("Requested Id not found ");
-            throw new NotFoundException("Requested Id not found ");
+            return null;
         }
 
         public async Task<TodoList> AddTodos(TodoList model)
         {
+            CheckList();
             var updatedModel = result.FirstOrDefault(x => x.id == model.id);
             if (updatedModel == null)
             {
@@ -50,7 +46,7 @@ namespace POC_ConsumeAPI.Helper
 
         public async Task<TodoList> UpdateTodos(TodoList model, int id)
         {
-          
+            CheckList();
             var updatedModel = result.FirstOrDefault(x => x.id == model.id);
             if (updatedModel != null)
             {
@@ -67,7 +63,7 @@ namespace POC_ConsumeAPI.Helper
 
         public async Task<Boolean> DeleteByID(int id)
         {
-
+            CheckList();
             var model = result.FirstOrDefault(x => x.id == id);
             if (model != null)
             {
@@ -79,5 +75,24 @@ namespace POC_ConsumeAPI.Helper
 
         }
 
+
+        #region Internal method 
+
+        private void CheckList()
+        {
+            if (result == null)
+            {
+                Console.WriteLine("List is not present locally");
+                throw new InvalidException("List is not present locally ," +
+                   " First need to fetch the list from Todos");
+            }
+        }
+
+        private void CheckItemById(int id)
+        {
+            var resultModel = result.FirstOrDefault(x => x.id == id);
+        }
+
+        #endregion
     }
 }

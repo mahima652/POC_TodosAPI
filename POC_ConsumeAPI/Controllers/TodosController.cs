@@ -46,9 +46,8 @@ namespace POC_ConsumeAPI.Controllers
             return Ok(ResponseMessageObject);
 
         }
-
         [Route("~/api/GetTodo/{id}")]
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetDataById(int id)
         {
             TodoList result = await _helperService.GetToDoListbyID(id);
@@ -58,7 +57,7 @@ namespace POC_ConsumeAPI.Controllers
                 return NotFound($"Item not found Successfully with id = {id} ");
             }
             ResponseMessageObject = ApiResponse.Success(200, result);
-            ResponseMessageObject.Message = "Getting item of id:- " + id.ToString();
+            ResponseMessageObject.Message = "Getting item of id: " + id.ToString();
 
             _logger.LogInformation("Getting item  of", id);
             return Ok(ResponseMessageObject);
@@ -89,7 +88,7 @@ namespace POC_ConsumeAPI.Controllers
                ResponseMessageObject);
         }
 
-        [Route("~/api/UpdateTodo")]
+        [Route("~/api/UpdateTodo/{id}")]
         [HttpPut]
         public async Task<IActionResult> UpdateData(TodoList model, int id)
         {
