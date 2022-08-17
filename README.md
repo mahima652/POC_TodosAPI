@@ -33,7 +33,7 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:7098/v1/api/AddTodo
+   3. POSTMAN LINK : https://localhost:7098/api/AddTodo
 4. PUT vi/api/UpdateTodo/{id}
    1. Header for X-APIKey should be provided
    2. Request body should have {
@@ -42,13 +42,13 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:7098/v1/api/UpdateTodo/{id}
+   3. POSTMAN LINK : https://localhost:7098/api/UpdateTodo/{id}
    4. Id of parameter and body should be the same
    5. Example for (id-5) : https://localhost:7098/api/UpdateTodo/5
 5. DELETE /v1//api/DeleteTodo/{id}
    1. Header for X-APIKey should be provided
    2. id can not be null and should be provided
-   3. POSTMAN LINK :  https://localhost:7098/v1/api/DeleteTodo/{id}
+   3. POSTMAN LINK :  https://localhost:7098/api/DeleteTodo/{id}
    4. Example for (id-5) : https://localhost:7098/api/DeleteTodo/5
    
 ## TodosLocal Endpoint
@@ -74,7 +74,7 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:7098/v1/api/AddLocalTodo
+   3. POSTMAN LINK : https://localhost:7098/api/AddLocalTodo
 4. PUT vi/api/UpdateLocalTodo/{id}
    1. Header for X-APIKey should be provided
    2. Request body should have {
@@ -83,12 +83,12 @@ This Controller consume 3rd party Given api(https://jsonplaceholder.typicode.com
       "title": "string",
       "completed": true
    }
-   3. POSTMAN LINK : https://localhost:7098/v1/api/UpdateLocalTodo/{id}
+   3. POSTMAN LINK : https://localhost:7098/api/UpdateLocalTodo/{id}
    4. Id of parameter and body should be the same
    5. Example for (id-5) : https://localhost:7098/api/UpdateLocalTodo/5
 5. DELETE /v1//api/DeleteLocalTodo/{id}
    1. Header for X-APIKey should be provided
    2. id can not be null and should be provided
-   3. POSTMAN LINK :  https://localhost:7098/v1/api/DeleteLocalTodo/{id}
+   3. POSTMAN LINK :  https://localhost:7098/api/DeleteLocalTodo/{id}
    3. Example for (id-5) : https://localhost:7098/api/DeleteLocalTodo/5
    
