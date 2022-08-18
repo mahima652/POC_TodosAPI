@@ -2,6 +2,7 @@
 using POC_ConsumeAPI.Data;
 using POC_ConsumeAPI.ExceptionTYpe;
 using POC_ConsumeAPI.Model;
+using System.Net;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
@@ -12,129 +13,109 @@ namespace POC_ConsumeAPI.Helper
     public class TodoServices  : ITodoServices
     {
 
-        private readonly   HttpClient client ;
-        private static string BASE_URL  = "https://jsonplaceholder.typicode.com/todos/";
-        private static HttpResponseMessage response;
-        public static ApiResponse  ResponseObject ;
+        private readonly IConfiguration _config;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private HttpResponseMessage response;
+        private string url ;
 
-        public  TodoServices ()
+        public TodoServices (IConfiguration configuration , IHttpClientFactory clientFactory)
         {
-             client = new HttpClient();
-             client.BaseAddress = new Uri(BASE_URL);
-        }
-
-        public async Task<List<TodoList>> GetToDoList()
-        {
-
-            response = await client.GetAsync(BASE_URL);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseBody = response.Content.ReadAsStringAsync().Result;
-                Data.DataContext.dataCxt = JsonConvert.DeserializeObject<List<TodoList>>(responseBody);
-                Console.WriteLine(responseBody);
-                return Data.DataContext.dataCxt;
-            }
-            else
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", response.ReasonPhrase);
-                throw new Exception(response.ReasonPhrase);
-            }
-                
-        }
-      
-        public async Task<TodoList> GetToDoListbyID(int id)
-        {
-            var model = new TodoList();
-            HttpResponseMessage response = await client.GetAsync(BASE_URL +id);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseBody = response.Content.ReadAsStringAsync().Result;
-                model = JsonConvert.DeserializeObject<TodoList>(responseBody);
-                Console.WriteLine(responseBody);
-                return model;
-            }
-
-            else
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", response.ReasonPhrase);
-                throw new Exception(response.ReasonPhrase);
-            }
+            _config = configuration;
+            _httpClientFactory = clientFactory;
+            url = _config.GetValue<string>("BASE_URL");
 
         }
 
-        public async Task<TodoList> AddTodos(TodoList model)
+        /// <summary>
+        /// Get all Todo list
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<TodoList>> GetAllAsync()
         {
-            //HTTP POST
-
-            HttpRequestMessage request = CretaeRequest(model);
-            request = new HttpRequestMessage(HttpMethod.Post, BASE_URL);
-            HttpResponseMessage response = await client.PostAsync(BASE_URL, request.Content);
-
-            if (CheckStatusCode(response))
-                return model;
-            else
-                throw new InvalidException("Requested Item is not valid ");
-
-        }
-
-        public async Task<TodoList> UpdateTodos(TodoList model, int id)
-        {
-            //HTTP PUT
-            HttpRequestMessage request = CretaeRequest(model);
-            request = new HttpRequestMessage(HttpMethod.Put, BASE_URL);
-            HttpResponseMessage response = await client.PutAsync(BASE_URL + id, request.Content);
-
-            if (CheckStatusCode(response))
-                return model;
-            else
-                throw new Exception("Requested Item is not valid ");
-        }
-
-        public async Task<Boolean> DeleteByID(int id)
-        {
-            // DELETE
-            var url = string.Format(BASE_URL + id, id);
-            HttpResponseMessage response = await client.DeleteAsync(url);
-            if(CheckStatusCode(response))
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            if (await SendRequest( request))
             {
-                return true;
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<TodoList>>(responseBody);
             }
-            throw new NotFoundException("Requested Item not found exception");
+            return null;
         }
 
-        #region Internal Method
-
-        private Boolean CheckStatusCode(HttpResponseMessage response)
+        /// <summary>
+        ///  Get todos item by id  
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<TodoList> GetAsync(int id)
         {
-            if (response.IsSuccessStatusCode)
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{url}{id}");
+            if( await SendRequest( request))
             {
-                Console.WriteLine("Message :{0} ", response.ReasonPhrase);
-                Console.WriteLine("Message :{0} ", response.StatusCode);
-                Console.WriteLine("Message :{0} ", response.IsSuccessStatusCode);
-                return true;
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<TodoList>(responseBody);
             }
-            else
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", response.ReasonPhrase);
-                return false;
-            }
+            return null;
         }
 
-        private HttpRequestMessage CretaeRequest(TodoList model)
+        /// <summary>
+        ///  Create a new item 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAsync(TodoList model)
         {
-            HttpRequestMessage request = new HttpRequestMessage();
-            var httpRequest = JsonConvert.SerializeObject(model);
-            request.Content = new StringContent(httpRequest, Encoding.UTF8);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            return request;
+            var request = new HttpRequestMessage(HttpMethod.Post,url);
+            return await SendRequest( request , model );
+
+        }
+
+        /// <summary>
+        ///  Update the item 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateAsync(TodoList model)
+        {
+            var  request = new HttpRequestMessage(HttpMethod.Put, $"{url}{model.id}");
+            return await SendRequest( request , model);
+        }
+
+        /// <summary>
+        /// Delete the requested item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"{url}{id}");
+            return await SendRequest(request );
+        }
+
+
+        #region Internal Method 
+
+        /// <summary>
+        ///  This method is used to create and send the request 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="request"></param>
+        /// <param name="requestType"></param>
+        /// <returns></returns>
+        private async Task<Boolean> SendRequest(HttpRequestMessage request , TodoList model = null)
+        {
+            if (request.Method != HttpMethod.Delete && request.Method != HttpMethod.Get)
+            {
+                if (model == null)
+                    return false;
+                request.Content = new StringContent(
+                   JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            }
+            var client = _httpClientFactory.CreateClient();
+            response = await client.SendAsync(request);
+            return response.IsSuccessStatusCode;
         }
 
         #endregion
-
     }
 }

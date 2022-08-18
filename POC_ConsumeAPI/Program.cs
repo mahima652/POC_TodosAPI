@@ -18,11 +18,12 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
-builder.Services.AddScoped<ITodoLocalServices, TodoLocalServices>();
+//builder.Services.AddScoped<ITodoLocalServices, TodoLocalServices>();
 builder.Services.AddScoped<ITodoServices, TodoServices>();
 builder.Services.AddSingleton<DataContext>();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -5,15 +5,15 @@ namespace POC_ConsumeAPI.Helper
 {
     public interface IServices
     {
-        Task<List<TodoList>> GetToDoList();
+        Task<List<TodoList>> GetAllAsync();
 
-        Task<TodoList> GetToDoListbyID(int id);
+        Task<TodoList> GetAsync(int id);
 
-        Task<Boolean> DeleteByID(int id );
+        Task<bool> CreateAsync(TodoList model);
 
-        Task<TodoList> AddTodos(TodoList model);
+        Task<bool> UpdateAsync(TodoList model);
 
-        Task<TodoList> UpdateTodos(TodoList model, int id);
+        Task<bool> DeleteAsync( int id);
     }
 
     public interface ITodoServices : IServices

@@ -26,7 +26,7 @@ namespace POC_ConsumeAPI.Middleware
 
         private static Task HandleException(HttpContext context, Exception ex, ILogger<ExceptionHandlerMiddleware> logger)
         {
-            logger.LogError("Error retrieving data from the database " + " Giving excetion as " + ex.Message);
+            logger.LogError(ex.Message);
             var errorMessageObject = ApiResponse.Fail( ex.Message  , 500);
             var statusCode = (int)HttpStatusCode.InternalServerError;
             switch (ex)
@@ -45,7 +45,6 @@ namespace POC_ConsumeAPI.Middleware
                     errorMessageObject.StatusCode = 401;
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     break;
-
             }
 
             var errorMessage = JsonConvert.SerializeObject(errorMessageObject);
