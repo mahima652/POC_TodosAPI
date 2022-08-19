@@ -1,11 +1,9 @@
 using POC_ConsumeAPI.Helper;
 using POC_ConsumeAPI.Middleware;
 using Serilog;
-using POC_ConsumeAPI.Data;
-using Unity.Microsoft.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore;
 using POC_ConsumeAPI.Filter;
+using POC_ConsumeAPI.Services.IServices;
+using POC_ConsumeAPI.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +16,9 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
-//builder.Services.AddScoped<ITodoLocalServices, TodoLocalServices>();
+builder.Services.AddScoped<ITodoLocalServices, TodoLocalServices>();
 builder.Services.AddScoped<ITodoServices, TodoServices>();
 builder.Services.AddSingleton<DataContext>();
-
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 
@@ -32,11 +29,8 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<OperationFilter>();
 });
 
-var app = builder.Build();
-
 // Configure the HTTP request pipeline.
-
-
+var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -44,12 +38,11 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-
+// Add Custom middleware 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

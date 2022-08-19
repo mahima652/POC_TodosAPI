@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using POC_ConsumeAPI.Data;
 using POC_ConsumeAPI.ExceptionTYpe;
-using POC_ConsumeAPI.Helper;
 using POC_ConsumeAPI.Middleware;
 using POC_ConsumeAPI.Model;
+using POC_ConsumeAPI.Services.IServices;
 
 namespace POC_ConsumeAPI.Controllers
 {
@@ -16,14 +16,14 @@ namespace POC_ConsumeAPI.Controllers
 
     public class TodosController : ControllerBase
     {
-        private readonly ITodoServices _helperService;
+        private readonly ITodoServices _todoServices_;
         private readonly ILogger<TodosController> _logger;
         ApiResponse ResponseMessageObject ;
 
 
-        public TodosController (ITodoServices helperService, ILogger<TodosController> logger)
+        public TodosController (ITodoServices todoServices, ILogger<TodosController> logger)
         {
-            _helperService = helperService ;
+            _todoServices_ = todoServices;
             _logger = logger;
         }
 
@@ -33,7 +33,7 @@ namespace POC_ConsumeAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTodo()
         {
-            List<TodoList> result = await _helperService.GetAllAsync();
+            List<ToDo> result = await _todoServices_.GetAllAsync();
             if (result == null)
             {
                 _logger.LogWarning("List is empty");
@@ -49,7 +49,7 @@ namespace POC_ConsumeAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTodo(int id)
         {
-            TodoList result = await _helperService.GetAsync(id);
+            ToDo result = await _todoServices_.GetAsync(id);
             if (result == null)
             {
                 _logger.LogWarning("Get NOTFOUND of ", id);
@@ -64,11 +64,11 @@ namespace POC_ConsumeAPI.Controllers
 
         [Route("/api/AddTodo")]
         [HttpPost]
-        public async Task<IActionResult> Create(TodoList model)
+        public async Task<IActionResult> Create(ToDo model)
         {
             if (ModelState.IsValid)
             {
-                await _helperService.CreateAsync(model);
+                await _todoServices_.CreateAsync(model);
                 _logger.LogInformation("New item created");
                 ResponseMessageObject = ApiResponse.Success("Requted item is created Successfully" ,201, model);
                 return CreatedAtAction(nameof(GetTodo), new { id = model.id },
@@ -85,7 +85,7 @@ namespace POC_ConsumeAPI.Controllers
 
         [Route("/api/UpdateTodo/{id}")]
         [HttpPut]
-        public async Task<IActionResult> Update(TodoList model, int id)
+        public async Task<IActionResult> Update(ToDo model, int id)
         {
            
             if (!ModelState.IsValid)
@@ -95,7 +95,7 @@ namespace POC_ConsumeAPI.Controllers
                 return BadRequest(ResponseMessageObject);
             }
 
-            var status = await _helperService.UpdateAsync(model);
+            var status = await _todoServices_.UpdateAsync(model);
             if (!status)
             {
                 _logger.LogWarning("Get({Id}) NOT FOUND", id);
@@ -114,7 +114,7 @@ namespace POC_ConsumeAPI.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            bool status = await _helperService.DeleteAsync(id);
+            bool status = await _todoServices_.DeleteAsync(id);
             if (!status)
             {
                 _logger.LogWarning($"Requted item of id {id} not found");
