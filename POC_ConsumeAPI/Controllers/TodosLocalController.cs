@@ -1,140 +1,152 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using POC_ConsumeAPI.Data;
-//using POC_ConsumeAPI.ExceptionTYpe;
-//using POC_ConsumeAPI.Helper;
-//using POC_ConsumeAPI.Middleware;
-//using POC_ConsumeAPI.Model;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using POC_ConsumeAPI.Data;
+using POC_ConsumeAPI.ExceptionTYpe;
+using POC_ConsumeAPI.Helper;
+using POC_ConsumeAPI.Middleware;
+using POC_ConsumeAPI.Model;
+using POC_ConsumeAPI.Services.IServices;
 
-//namespace POC_ConsumeAPI.Controllers
-//{
-//    [Consumes("application/json")]
-//    [Produces("application/json")]
-//    [Route("api/Todo")]
-//    [ApiController]
-//    public class TodosLocalController : ControllerBase
-//    {
-//        private readonly ITodoLocalServices _helperService;
-//        private readonly ILogger<TodosController> _logger;
-//        ApiResponse ResponseMessageObject;
+namespace POC_ConsumeAPI.Controllers
+{
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [Route("api/Todo")]
+    [ApiController]
 
+    /// <summary>
+    ///  This Controller is used perform CRUD operation on local list 
+    /// </summary>
+    /// <param name="helperServices"></param>
+    /// <param name="logger"></param>
+    public class ToDoLocalController : ControllerBase
+    {
+        #region Property
 
-//        public TodosLocalController(ITodoLocalServices helperServices, ILogger<TodosController> logger)
-//        {
-//            _helperService = helperServices;
-//            _logger = logger;
-//        }
+        private readonly ITodoLocalServices _toDoLocalServices;
+        private readonly ILogger<ToDoLocalController> _logger;
+        ApiResponse ResponseMessageObject;
 
-//        #region HTTP Verbs
+        #endregion
 
-//        [Route("/api/GetAllLocalTodos")]
-//        [HttpGet]
-//        public async Task<IActionResult> GetTodosList()
-//        {
-//            List<TodoList> result = await _helperService.GetToDoList();
-//            if (result != null)
-//            {
-//                _logger.LogInformation("Todos loacl list get Executed");
-//                ResponseMessageObject = ApiResponse.Success(200, result);
-//                ResponseMessageObject.Message = "Todos local List get Exceuted";
-//                return Ok(ResponseMessageObject);
-//            }
-//            throw new Exception("Error feteching data : Internal Server Error");
-//        }
+        #region HTTP Method
 
-//        [Route("/api/GetLocalTodo/{id}")]
-//        [HttpGet]
-//        public async Task<IActionResult> GetTodosById(int id)
-//        {
-//            TodoList result = await _helperService.GetToDoListbyID(id);
-//            if (result == null)
-//            {
-//                _logger.LogWarning(" NOT FOUND", id);
-//                throw new NotFoundException("Requested Item Not Found");
-//            }
-//            _logger.LogInformation("Getting item of id :", id);
-//            ResponseMessageObject = ApiResponse.Success(200, result);
-//            ResponseMessageObject.Message = "Getting item of id :-" + id.ToString();
-//            return Ok(ResponseMessageObject);
+        /// <summary>
+        /// Initialize the new instance with Servies and logger 
+        /// </summary>
+        /// <param name="helperServices"></param>
+        /// <param name="logger"></param>
+        public ToDoLocalController(ITodoLocalServices toDoLocalServices, ILogger<ToDoLocalController> logger)
+        {
+            _toDoLocalServices = toDoLocalServices;
+            _logger = logger;
+        }
 
-//        }
+        #region HTTP Verbs
 
-//        [Route("/api/AddLocalTodo")]
-//        [HttpPost]
-//        public async Task<IActionResult> CreateLocalTodo(TodoList model)
-//        {
+        /// <summary>
+        /// Get local ToDo list 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [Route("/api/GetAllLocalTodos")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllToDo()
+        {
+            List<ToDo> result = await _toDoLocalServices.GetAllAsync();
+            _logger.LogInformation("Todos loacl list get Executed");
+            ResponseMessageObject = ApiResponse.Success("Todos local List get Exceuted", 200, result);
+            return Ok(ResponseMessageObject);
+        }
 
-//            if (model == null)
-//            {
-//                _logger.LogWarning("Input not valid ");
-//                return BadRequest("Input not valid ");
-//            }
+        /// <summary>
+        /// Get todo item from local Todo list
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException"></exception>
+        [Route("/api/GetLocalTodo/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> GetToDo(int id)
+        {
+            ToDo result = await _toDoLocalServices.GetAsync(id);
+            _logger.LogInformation("Getting item of id :", id);
+            ResponseMessageObject = ApiResponse.Success("Getting item of id :-" + id.ToString(),200, result);
+            return Ok(ResponseMessageObject);
 
-//            var expected = await _helperService.GetToDoListbyID(model.id);
-//            if (expected != null)
-//            {
-//                Console.WriteLine("Model is already in use");
-//                _logger.LogWarning("Requested input is already present");
-//                return BadRequest("Requested input is already present");
-//            }
+        }
 
-//            var createdModel = await _helperService.AddTodos(model);
-//            ResponseMessageObject = ApiResponse.Success(201, createdModel);
-//            ResponseMessageObject.Message = "Successfully Requted item Cretaed ";
-//            _logger.LogInformation("New item created");
-//            return CreatedAtAction(nameof(GetTodosList), new { id = createdModel.id },
-//               ResponseMessageObject);
+        /// <summary>
+        /// Create ToDo item in local ToDo list
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Route("/api/AddLocalTodo")]
+        [HttpPost]
+        public async Task<IActionResult> Create(ToDo model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _toDoLocalServices.CreateAsync(model);
+                _logger.LogInformation("New item created");
+                ResponseMessageObject = ApiResponse.Success("Requted item is created Successfully", 201, model);
+                return CreatedAtAction(nameof(GetToDo), new { id = model.id },
+                   ResponseMessageObject);
+            }
+            else
+            {
+                _logger.LogWarning("Input not valid");
+                ResponseMessageObject = ApiResponse.Fail("Input not valid", 400);
+                return BadRequest(ResponseMessageObject);
+            }
+        }
 
-//        }
-
-//        [Route("/api/UpdateLocalTodo/{id}")]
-//        [HttpPut]
-//        public async Task<IActionResult> UpdateLocalTodo(TodoList model, int id)
-//        {
-
-//            if (id != model.id)
-//            {
-//                _logger.LogWarning("Input not valid :- Requested id is not matched");
-//                return BadRequest("Input not valid :- Requested id is not matched");
-//            }
-//            var modelToupdate = await _helperService.GetToDoListbyID(model.id);
-//            if (modelToupdate == null)
-//            {
-//                _logger.LogWarning("Get({Id}) NOT FOUND", id);
-//                Console.WriteLine("Model with Id = {id} not found");
-//                return NotFound($"Model with Id = {id} not found");
-//            }
-
-//            var updatedModel = await _helperService.UpdateTodos(model, id);
-//            _logger.LogInformation(" Requested item Updated");
-//            ResponseMessageObject = ApiResponse.Success(200, updatedModel);
-//            ResponseMessageObject.Message = "Successfully Requted item Updated ";
-//            return CreatedAtAction(nameof(GetTodosList), new { id = updatedModel.id },
-//                  ResponseMessageObject);
-
-//        }
-
-//        [Route("/api/DeleteLocalTodo/{id}")]
-//        [HttpDelete]
-//        public async Task<IActionResult> DeleteLocalTodoByID(int id)
-//        {
-//            bool result = await _helperService.DeleteByID(id);
-//            if (!result)
-//            {
-//                _logger.LogWarning("Get({Id}) NOT FOUND", id);
-//                throw new NotFoundException("Requested Item Not Found");
-//            }
-//            _logger.LogInformation(" Requested item is Deleted");
-//            ResponseMessageObject = ApiResponse.Success(200, null);
-//            ResponseMessageObject.Message = "Successfully Requted item Deleted ";
-//            return Ok(ResponseMessageObject);
-
-//        }
+        /// <summary>
+        /// Get Update item in local ToDo list
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("/api/UpdateLocalTodo/{id}")]
+        [HttpPut]
+        public async Task<IActionResult> Update(ToDo model, int id)
+        {
+            if (model.id != id)
+            {
+                _logger.LogWarning("Input not valid");
+                ResponseMessageObject = ApiResponse.Fail("Input not valid", 400);
+                return BadRequest(ResponseMessageObject);
+            }
+            await _toDoLocalServices.UpdateAsync(model);
+            _logger.LogInformation(" Requested item Updated");
+            ResponseMessageObject = ApiResponse.Success("Requted item is Updated Successfully", 201, model);
+            return CreatedAtAction(nameof(GetToDo), new { id = model.id },
+                  ResponseMessageObject);
 
 
-//    }
+        }
 
-//    #endregion
-//}
+        /// <summary>
+        /// Delete item for local ToDo list
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException"></exception>
+        [Route("/api/DeleteLocalTodo/{id}")]
+        [HttpDelete]
+        public async Task<IActionResult> Delete (int id)
+        {
+                await _toDoLocalServices.DeleteAsync(id);
+                _logger.LogInformation(" Requested item is Deleted");
+                ResponseMessageObject = ApiResponse.Success("Successfully Requted item Deleted ", 200, null);
+                return Ok(ResponseMessageObject);
+        }
+
+        #endregion
+
+    }
+
+    #endregion
+}
 
 

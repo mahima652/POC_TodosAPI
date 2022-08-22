@@ -24,18 +24,15 @@ namespace POC_ConsumeAPI.Helper
         #region HTTP Method
 
         /// <summary>
-        /// Get all the list which is present locally
+        /// Get the local list from todolist
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public async Task<List<ToDo>> GetAllAsync()
         {
-            result = Data.DataContext.dataCxt;
-            if(result != null)
-            {
-                return result;
-            }
-            throw new Exception("Internal server error");
+            result = DataContext.dataCxt;
+            CheckList();
+            return result;
         }
 
         /// <summary>
@@ -64,15 +61,15 @@ namespace POC_ConsumeAPI.Helper
         public async Task<bool> CreateAsync(ToDo model)
         {
             CheckList();
-            var updatedModel = result.FirstOrDefault(x => x.id == model.id);
-            if (updatedModel == null)
+            var createdModel =  result.FirstOrDefault(x => x.id == model.id);
+            if (createdModel == null)
             {
-                result.Add(model);
+                 result.Add(model);
                 return true;
             }
             throw new InvalidException("Requested Item is already present ");
         }
-
+        
         /// <summary>
         /// Update the item which is present locally 
         /// </summary>
@@ -125,7 +122,6 @@ namespace POC_ConsumeAPI.Helper
         {
             if (result == null)
             {
-                Console.WriteLine("List is not present locally");
                 throw new InvalidException("List is not present locally ," +
                    " First need to fetch the list from Todos");
             }

@@ -5,14 +5,34 @@ using System.Net;
 
 namespace POC_ConsumeAPI.Middleware
 {
+    /// <summary>
+    /// Middleware for handling global errors or exceptions
+    /// Responsible for catching the exceptions and logging to the log file
+    /// </summary>
     public class ExceptionHandlerMiddleware 
     {
+        #region Property
+
         private readonly RequestDelegate _next;
-        public ExceptionHandlerMiddleware(RequestDelegate next)
+        private readonly ILogger _logger;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        ///  Initializes a new instance of the <see cref="ExceptionHandlerMiddleware"/> class.
+        /// </summary>
+        /// <param name="next"></param>
+        public ExceptionHandlerMiddleware(RequestDelegate next , ILogger<ExceptionHandlerMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
-        public async Task InvokeAsync(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger )
+
+        #endregion
+
+        public async Task InvokeAsync(HttpContext context )
         {
             try
             {
@@ -20,36 +40,35 @@ namespace POC_ConsumeAPI.Middleware
             }
             catch (Exception ex)
             {
-                await HandleException(context, ex, logger);
+                await HandleException(context, ex, _logger);
             }
         }
 
-        private static Task HandleException(HttpContext context, Exception ex, ILogger<ExceptionHandlerMiddleware> logger)
+        private static Task HandleException(HttpContext context, Exception ex, ILogger logger)
         {
             logger.LogError(ex.Message);
-            var errorMessageObject = ApiResponse.Fail( ex.Message  , 500);
-            var statusCode = (int)HttpStatusCode.InternalServerError;
+            var errorMessageObject = ApiResponse.Fail( ex.Message , (int)HttpStatusCode.InternalServerError);
+
             switch (ex)
             {
                 case InvalidException:
-                    errorMessageObject.StatusCode = 400;
-                    statusCode = (int)HttpStatusCode.BadRequest;
+                    errorMessageObject.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
 
                 case NotFoundException:
-                    errorMessageObject.StatusCode = 404;
-                    statusCode = (int)HttpStatusCode.NotFound;
+                    errorMessageObject.StatusCode = (int)HttpStatusCode.NotFound;
                     break;
 
                 case UnAuthorizedException:
-                    errorMessageObject.StatusCode = 401;
-                    statusCode = (int)HttpStatusCode.Unauthorized;
+                    errorMessageObject.StatusCode = (int)HttpStatusCode.Unauthorized;
                     break;
+
+             
             }
 
             var errorMessage = JsonConvert.SerializeObject(errorMessageObject);
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = statusCode;
+            context.Response.StatusCode = errorMessageObject.StatusCode;
             return context.Response.WriteAsync(errorMessage);
         }
     }

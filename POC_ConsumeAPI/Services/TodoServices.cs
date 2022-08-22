@@ -27,6 +27,11 @@ namespace POC_ConsumeAPI.Helper
 
         #region Constructor
 
+        /// <summary>
+        ///  Initializes  a new instance of the class  
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="clientFactory"></param>
         public TodoServices (IConfiguration configuration , IHttpClientFactory clientFactory)
         {
             _config = configuration;
@@ -49,7 +54,8 @@ namespace POC_ConsumeAPI.Helper
             if (await SendRequest( request))
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<List<ToDo>>(responseBody);
+                DataContext.dataCxt = JsonConvert.DeserializeObject<List<ToDo>>(responseBody);
+                return DataContext.dataCxt;
             }
             return null;
         }
@@ -127,7 +133,11 @@ namespace POC_ConsumeAPI.Helper
             }
             var client = _httpClientFactory.CreateClient();
             response = await client.SendAsync(request);
-            return response.IsSuccessStatusCode;
+            if(!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+            return true;
         }
 
         #endregion

@@ -34,9 +34,9 @@
         /// <param name="code"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static ApiResponse Success(string errorMessage ,int code  , object result)
+        public static ApiResponse Success(string successMessage ,int code  , object result)
         {
-            return new ApiResponse { Succeeded = true,  StatusCode = code  , Result = result };
+            return new ApiResponse { Succeeded = true,  StatusCode = code  , Result = result , Message = successMessage };
         }
 
         #endregion
